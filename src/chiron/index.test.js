@@ -1,11 +1,11 @@
 /* eslint-env mocha */
 import { assert, expect } from 'chai'
 
-import darrensBot, { ActionTypes } from '.'
+import chiron, { ActionTypes } from '.'
 
-describe('darrens bot', () => {
-
-  let bot = darrensBot()
+describe('chiron', () => {
+  let bot = chiron()
+  const defaultGreeting = 'Hello, I`m Chiron!'
 
   it('has an API', () => {
     assert.isFunction(bot.learn)
@@ -15,7 +15,7 @@ describe('darrens bot', () => {
   })
 
   it('has some default actions', () => {
-    expect(bot.respond('hello')).to.equal('Hello!')
+    expect(bot.respond('hello')).to.equal(defaultGreeting)
   })
 
   describe('respond API', () => {
@@ -33,18 +33,18 @@ describe('darrens bot', () => {
 
     it('can use various keywords to perform the same action', () => {
       const keywords = ['hi', 'hello', 'hey', 'howdy']
-      keywords.forEach(k => expect(bot.respond(k)).to.equal('Hello!'))
+      keywords.forEach(k => expect(bot.respond(k)).to.equal(defaultGreeting))
     })
 
     it('doesn`t care about input case', () => {
       const keywords = ['hi', 'HI', 'Hi', 'hI']
-      keywords.forEach(k => expect(bot.respond(k)).to.equal('Hello!'))
+      keywords.forEach(k => expect(bot.respond(k)).to.equal(defaultGreeting))
     })
   })
 
   describe('learn API', () => {
     beforeEach(() => {
-      bot = darrensBot()
+      bot = chiron()
     })
 
     const action = {

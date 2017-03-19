@@ -1,5 +1,5 @@
 {
-  "name": "chrion",
+  "name": "chiron",
   "version": "0.0.1",
   "description": "A chat bot, written from the ground up",
   "main": "index.js",
@@ -14,6 +14,15 @@
   },
   "engines": {
     "node": ">= 7.0.0"
+  },
+  "homepage": "https://github.com/mr-beerkiss/chiron.git",
+  "author": {
+    "name": "Darren Beukes",
+    "email": "darren.beukes@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mr-beerkiss/chiron.git"
   },
   "nyc": {
     "reporter": "text-summary",
@@ -49,6 +58,7 @@
   "dependencies": {
     "koa": "^2.2.0",
     "koa-bodyparser": "^4.1.0",
-    "koa-router": "next"
+    "koa-router": "next",
+    "shortid": "^2.2.8"
   }
 }

@@ -3,12 +3,12 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 
 import config from './config'
-import darrensBot from './darrens-bot'
+import chiron from './chiron'
 
 const app = new Koa()
 const router = new Router()
 
-const bot = darrensBot()
+const bot = chiron()
 
 router.post('/message', (ctx, next) => {
   ctx.body = bot.respond(ctx.request.body.message)

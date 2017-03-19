@@ -2,13 +2,23 @@ const ActionTypes = {
   SAY: Symbol('say')
 }
 
-const darrensBot = () => {
+const chiron = () => {
   const DefaultActions = [
     {
       label: 'greet',
       keywords: ['hello', 'hi', 'hey', 'howdy'],
       type: ActionTypes.SAY,
-      response: 'Hello!'
+      response: 'Hello, I`m Chiron!'
+    },
+    {
+      label: 'why',
+      keywords: ['why'],
+      type: ActionTypes.SAY,
+      response: `
+        My maker called me this based on the Greek Myth of Chiron.  A centaur sired by the titan
+        Chronus, Chiron was reknowned as a teacher and a tutor.  It was said his personal skills
+        were a match for Apollo.  https://en.wikipedia.org/wiki/Chiron
+      `
     }
   ]
 
@@ -65,5 +75,5 @@ export {
   ActionTypes
 }
 
-export default darrensBot
+export default chiron
 
