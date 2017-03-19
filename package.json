@@ -7,7 +7,7 @@
     "lint": "standard",
     "test": "nyc _mocha \"src/**/*.test.js\"",
     "coverage": "nyc report --reporter=text --reporter-text-summary --reporter=html",
-    "dev": "nodemon src/index.js",
+    "dev": "echo 'Did you remember to switch to Node 7?\n' && nodemon src/index.js",
     "build": "babel src --out-dir lib",
     "start": "node lib"
   },

@@ -1,3 +1,5 @@
+import shortid from 'shortid'
+
 const ActionTypes = {
   SAY: Symbol('say')
 }
@@ -25,6 +27,10 @@ const chiron = () => {
   const actions = [...DefaultActions]
 
   const DEFAULT_RESPONSE = `I'm sorry, I don't know what to do about that`
+  
+  const INVALID_SESSION_ID_MSG = 'A valid session id is required to call this method'
+
+  const sessions = []
 
   function actionFromKeyword (keyword) {
     return actions.find(v => v.keywords.includes(keyword))
@@ -39,8 +45,13 @@ const chiron = () => {
     return !!Object.keys(ActionTypes).find(k => ActionTypes[k] === actionType)
   }
 
+  function sessionExists (sessionId) {
+    return !!sessions.find(s => s.id === sessionId)
+  }
+
   return {
-    learn (action) {
+    learn (sessionId, action) {
+      if (!sessionExists(sessionId)) throw new Error(INVALID_SESSION_ID_MSG)
       if (!action || typeof action !== 'object' || action.length) {
         throw new Error('Input must be present and must be an object')
       } else {
@@ -52,7 +63,8 @@ const chiron = () => {
       }
       actions.push(action)
     },
-    respond (message) {
+    respond (sessionId, message) {
+      if (!sessionExists(sessionId)) throw new Error(INVALID_SESSION_ID_MSG)
       // sanitize input
       if (typeof message !== 'string') throw new Error('Input must be present and be of type string')
 
@@ -67,6 +79,31 @@ const chiron = () => {
     },
     getActions () {
       return actions
+    },
+    createSession (username) {
+      if (typeof username !== 'string' || username.length === 0) throw new Error('You must supply a string identifier to start a session')
+      // TODO: Should usernames be forced to be unique?
+      // I would say No, since it would be up to the application to manage the session id for the
+      // user, and the session id will be the uniquie identifier, not the username
+      const id = shortid.generate()
+      const timeCreated = Date.now()
+      sessions.push({
+        id,
+        username,
+        timeCreated,
+        timeLastUsed: timeCreated
+      })
+
+      return id
+    },
+    getSession (sessionId) {
+      const session = sessions.find(s => s.id === sessionId) || null
+      return session
+    },
+    destroySession (sessionId) {
+      if (!sessionExists(sessionId)) throw new Error('The supplied session id does not exist')
+      const index = sessions.findIndex(s => s.id === sessionId)
+      sessions.splice(index)
     }
   }
 }
