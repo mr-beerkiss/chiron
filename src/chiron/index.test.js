@@ -1,6 +1,4 @@
-/* eslint-env mocha */
-import shortid from 'shortid';
-
+/* eslint-env jest */
 import chiron, { ActionTypes } from '.'
 
 describe('chiron', () => {
@@ -8,76 +6,17 @@ describe('chiron', () => {
   const testUser = 'testuser'
 
   let defaultBot = chiron()
-  let defaultSessionId = defaultBot.createSession(testUser)
+  let defaultSessionId = defaultBot.sessions.createSession(testUser)
 
   it('has an API', () => {
     expect(typeof defaultBot.learn).toBe('function')
     expect(typeof defaultBot.respond).toBe('function')
     expect(typeof defaultBot.getAction).toBe('function')
     expect(typeof defaultBot.getActions).toBe('function')
-    expect(typeof defaultBot.createSession).toBe('function')
-    expect(typeof defaultBot.getSession).toBe('function')
-    expect(typeof defaultBot.destroySession).toBe('function')
   })
 
   it('has some default actions', () => {
     expect(defaultBot.respond(defaultSessionId, 'hello')).toEqual(defaultGreeting)
-  })
-
-  describe('session API', () => {
-    let scopedBot
-    let scopedSessionId
-
-    beforeEach(() => {
-      scopedBot = chiron()
-      scopedSessionId = scopedBot.createSession(testUser)
-    })
-
-    describe('create a session', () => {
-      it('throws an error if invalid input is provided', () => {
-        const thrownMsg = 'You must supply a string identifier to start a session'
-        expect(scopedBot.createSession).toThrow(thrownMsg)
-        const dodgyArgs = [null, 45.1, [1, 2, 3], {foo: 'bar'}]
-        dodgyArgs.forEach(a => expect(scopedBot.createSession.bind(scopedBot, a)).toThrow(thrownMsg))        
-        expect(scopedBot.createSession.bind(scopedBot, 'This should be ok')).toBeTruthy()
-      })
-
-      it('creates a session and returns a session id', () => {
-        const sessionId = scopedBot.createSession(testUser)
-        expect(typeof sessionId === 'string' && shortid.isValid(sessionId)).toBe(true)
-      })
-    })
-
-    describe('returns an existing session', () => {
-      it('returns null for an invalid session id', () => {
-        const dodgyId = shortid.generate()
-        expect(scopedBot.getSession(dodgyId)).toBeNull()
-      })
-
-      it('returns a valid session object for a valid id', done => {
-        const session = scopedBot.getSession(scopedSessionId)
-        expect(session.id).toEqual(scopedSessionId)
-        expect(session.username).toEqual(testUser)
-        setTimeout(() => {
-          expect(session.timeCreated).toBeLessThan(Date.now())
-          done()
-        }, 10)
-      })
-    })
-
-    describe('destroys a session', () => {
-      it('throws an exception if the session does not exist', () => {
-        const dodgyId = shortid.generate()
-        const thrownMsg = 'The supplied session id does not exist'
-        expect(scopedBot.destroySession.bind(scopedBot, dodgyId)).toThrow(thrownMsg)
-      })
-
-      it('successfully destroys an existing session', () => {
-        expect(scopedBot.getSession(scopedSessionId)).toBeTruthy()
-        scopedBot.destroySession(scopedSessionId)
-        expect(scopedBot.getSession(scopedSessionId)).toBeNull()
-      })
-    })
   })
 
   describe('respond API', () => {
@@ -88,7 +27,7 @@ describe('chiron', () => {
 
     beforeEach(() => {
       scopedBot = chiron()
-      scopedSessionId = scopedBot.createSession(testUser)
+      scopedSessionId = scopedBot.sessions.createSession(testUser)
     })
 
     it('requires a valid session id', () => {
@@ -128,7 +67,7 @@ describe('chiron', () => {
 
     beforeEach(() => {
       scopedBot = chiron()
-      scopedSessionId = scopedBot.createSession(testUser)
+      scopedSessionId = scopedBot.sessions.createSession(testUser)
     })
 
     const action = {
