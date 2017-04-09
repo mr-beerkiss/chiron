@@ -1,7 +1,5 @@
 /* eslint-env mocha */
-import { assert, expect } from 'chai'
-
-import shortid from 'shortid'
+import shortid from 'shortid';
 
 import chiron, { ActionTypes } from '.'
 
@@ -13,17 +11,17 @@ describe('chiron', () => {
   let defaultSessionId = defaultBot.createSession(testUser)
 
   it('has an API', () => {
-    assert.isFunction(defaultBot.learn)
-    assert.isFunction(defaultBot.respond)
-    assert.isFunction(defaultBot.getAction)
-    assert.isFunction(defaultBot.getActions)
-    assert.isFunction(defaultBot.createSession)
-    assert.isFunction(defaultBot.getSession)
-    assert.isFunction(defaultBot.destroySession)
+    expect(typeof defaultBot.learn).toBe('function')
+    expect(typeof defaultBot.respond).toBe('function')
+    expect(typeof defaultBot.getAction).toBe('function')
+    expect(typeof defaultBot.getActions).toBe('function')
+    expect(typeof defaultBot.createSession).toBe('function')
+    expect(typeof defaultBot.getSession).toBe('function')
+    expect(typeof defaultBot.destroySession).toBe('function')
   })
 
   it('has some default actions', () => {
-    expect(defaultBot.respond(defaultSessionId, 'hello')).to.equal(defaultGreeting)
+    expect(defaultBot.respond(defaultSessionId, 'hello')).toEqual(defaultGreeting)
   })
 
   describe('session API', () => {
@@ -38,30 +36,30 @@ describe('chiron', () => {
     describe('create a session', () => {
       it('throws an error if invalid input is provided', () => {
         const thrownMsg = 'You must supply a string identifier to start a session'
-        expect(scopedBot.createSession).to.throw(thrownMsg)
+        expect(scopedBot.createSession).toThrow(thrownMsg)
         const dodgyArgs = [null, 45.1, [1, 2, 3], {foo: 'bar'}]
-        dodgyArgs.forEach(a => expect(scopedBot.createSession.bind(scopedBot, a)).to.throw(thrownMsg))        
-        expect(scopedBot.createSession.bind(scopedBot, 'This should be ok')).to.be.ok
+        dodgyArgs.forEach(a => expect(scopedBot.createSession.bind(scopedBot, a)).toThrow(thrownMsg))        
+        expect(scopedBot.createSession.bind(scopedBot, 'This should be ok')).toBeTruthy()
       })
 
       it('creates a session and returns a session id', () => {
-        expect(scopedBot.createSession(testUser))
-          .to.satisfy(res => typeof res === 'string' && shortid.isValid(res))
+        const sessionId = scopedBot.createSession(testUser)
+        expect(typeof sessionId === 'string' && shortid.isValid(sessionId)).toBe(true)
       })
     })
 
     describe('returns an existing session', () => {
       it('returns null for an invalid session id', () => {
         const dodgyId = shortid.generate()
-        expect(scopedBot.getSession(dodgyId)).to.be.null
+        expect(scopedBot.getSession(dodgyId)).toBeNull()
       })
 
       it('returns a valid session object for a valid id', done => {
         const session = scopedBot.getSession(scopedSessionId)
-        expect(session.id).to.equal(scopedSessionId)
-        expect(session.username).to.equal(testUser)
+        expect(session.id).toEqual(scopedSessionId)
+        expect(session.username).toEqual(testUser)
         setTimeout(() => {
-          expect(session.timeCreated).to.be.below(Date.now())
+          expect(session.timeCreated).toBeLessThan(Date.now())
           done()
         }, 10)
       })
@@ -71,13 +69,13 @@ describe('chiron', () => {
       it('throws an exception if the session does not exist', () => {
         const dodgyId = shortid.generate()
         const thrownMsg = 'The supplied session id does not exist'
-        expect(scopedBot.destroySession.bind(scopedBot, dodgyId)).to.throw(thrownMsg)
+        expect(scopedBot.destroySession.bind(scopedBot, dodgyId)).toThrow(thrownMsg)
       })
 
       it('successfully destroys an existing session', () => {
-        expect(scopedBot.getSession(scopedSessionId)).to.be.ok
+        expect(scopedBot.getSession(scopedSessionId)).toBeTruthy()
         scopedBot.destroySession(scopedSessionId)
-        expect(scopedBot.getSession(scopedSessionId)).to.be.null
+        expect(scopedBot.getSession(scopedSessionId)).toBeNull()
       })
     })
   })
@@ -95,32 +93,32 @@ describe('chiron', () => {
 
     it('requires a valid session id', () => {
       const thrownMsg = 'A valid session id is required to call this method'
-      expect(scopedBot.respond).to.throw(thrownMsg)
+      expect(scopedBot.respond).toThrow(thrownMsg)
       const dodgyscopedSessionId = 'A dodgy session id'
-      expect(scopedBot.respond.bind(scopedBot, dodgyscopedSessionId, testMsg)).to.throw(thrownMsg)
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).to.be.ok
+      expect(scopedBot.respond.bind(scopedBot, dodgyscopedSessionId, testMsg)).toThrow(thrownMsg)
+      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).toBeTruthy()
     })
 
     it('throws an error if invalid input type is provided', () => {
       const thrownMsg = 'Input must be present and be of type string'
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId)).to.throw(thrownMsg)
+      expect(scopedBot.respond.bind(scopedBot, scopedSessionId)).toThrow(thrownMsg)
       const dodgyArgs = [null, 45.1, [1, 2, 3], {foo: 'bar'}]
-      dodgyArgs.forEach(a => expect(scopedBot.respond.bind(scopedBot, scopedSessionId, a)).to.throw(thrownMsg))
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).to.be.ok
+      dodgyArgs.forEach(a => expect(scopedBot.respond.bind(scopedBot, scopedSessionId, a)).toThrow(thrownMsg))
+      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).toBeTruthy()
     })
 
     it('returns a default message when it doesn\'t understand the input', () => {
-      expect(scopedBot.respond(scopedSessionId, 'dflkasjglasjlgas')).to.equal('I\'m sorry, I don\'t know what to do about that')
+      expect(scopedBot.respond(scopedSessionId, 'dflkasjglasjlgas')).toEqual('I\'m sorry, I don\'t know what to do about that')
     })
 
     it('can use various keywords to perform the same action', () => {
       const keywords = ['hi', 'hello', 'hey', 'howdy']
-      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).to.equal(defaultGreeting))
+      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).toEqual(defaultGreeting))
     })
 
     it('doesn`t care about input case', () => {
       const keywords = ['hi', 'HI', 'Hi', 'hI']
-      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).to.equal(defaultGreeting))
+      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).toEqual(defaultGreeting))
     })
   })
 
@@ -142,44 +140,44 @@ describe('chiron', () => {
 
     it('requires a valid session id', () => {
       const thrownMsg = 'A valid session id is required to call this method'
-      expect(scopedBot.learn).to.throw(thrownMsg)
+      expect(scopedBot.learn).toThrow(thrownMsg)
       const dodgyscopedSessionId = 'A dodgy session id'
-      expect(scopedBot.learn.bind(scopedBot, dodgyscopedSessionId, action)).to.throw(thrownMsg)
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, action)).to.be.ok
+      expect(scopedBot.learn.bind(scopedBot, dodgyscopedSessionId, action)).toThrow(thrownMsg)
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, action)).toBeTruthy()
     })
 
     it('throws an error if invalid input type is provided', () => {
       const thrownMsg = 'Input must be present and must be an object'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId)).to.throw(thrownMsg)
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId)).toThrow(thrownMsg)
       const dodgyArgs = [null, 'A string', 43.5, [1, 2, 3]]
-      dodgyArgs.forEach(a => expect(scopedBot.learn.bind(scopedBot, scopedSessionId, a)).to.throw(thrownMsg))
+      dodgyArgs.forEach(a => expect(scopedBot.learn.bind(scopedBot, scopedSessionId, a)).toThrow(thrownMsg))
     })
 
     it('validates its input object', () => {
       const badAction = {}
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action must have a label')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have a label')
       badAction.label = 'Some label'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action type is not valid')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action type is not valid')
       badAction.type = Symbol('faulty-action')
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action type is not valid')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action type is not valid')
       badAction.type = ActionTypes.SAY
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action must have a keywords array')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have a keywords array')
       badAction.keywords = []
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action must have at least one keyword')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have at least one keyword')
       badAction.keywords = ['some keyword']
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.throw('Action must supply a response string')
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must supply a response string')
       badAction.response = 'some response'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).to.be.ok
+      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toBeTruthy()
     })
 
-    it('returns an learned action', () => {
+    it('returns a learned action', () => {
       scopedBot.learn(scopedSessionId, action)
-      expect(scopedBot.getAction(action.label)).to.deep.equal(action)
+      expect(scopedBot.getAction(action.label)).toEqual(action)
     })
 
     it('learns a new action and responds accordingly', () => {
       scopedBot.learn(scopedSessionId, action)
-      action.keywords.forEach(kw => expect(scopedBot.respond(scopedSessionId, kw)).to.equal(action.response))
+      action.keywords.forEach(kw => expect(scopedBot.respond(scopedSessionId, kw)).toEqual(action.response))
     })
   })
 })
