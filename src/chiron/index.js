@@ -1,40 +1,17 @@
 import sessionManager from './session-manager'
+import responseManager from './response-manager'
 
 const ActionTypes = {
   SAY: Symbol('say')
 }
 
 const chiron = () => {
-  const DefaultActions = [
-    {
-      label: 'greet',
-      keywords: ['hello', 'hi', 'hey', 'howdy'],
-      type: ActionTypes.SAY,
-      response: 'Hello, I`m Chiron!'
-    },
-    {
-      label: 'why',
-      keywords: ['why'],
-      type: ActionTypes.SAY,
-      response: `
-        My maker called me this based on the Greek Myth of Chiron.  A centaur sired by the titan
-        Chronus, Chiron was reknowned as a teacher and a tutor.  It was said his personal skills
-        were a match for Apollo.  https://en.wikipedia.org/wiki/Chiron
-      `
-    }
-  ]
-
-  const actions = [...DefaultActions]
-
-  const DEFAULT_RESPONSE = `I'm sorry, I don't know what to do about that`
-
   const INVALID_SESSION_ID_MSG = 'A valid session id is required to call this method'
 
-  const sessions = sessionManager()
+  const actions = []
 
-  function actionFromKeyword (keyword) {
-    return actions.find(v => v.keywords.includes(keyword))
-  }
+  const sessions = sessionManager()
+  const responses = responseManager()
 
   function actionFromLabel (label) {
     return actions.find(v => v.label === label)
@@ -47,6 +24,7 @@ const chiron = () => {
 
   return {
     sessions,
+    responses,
     learn (sessionId, action) {
       if (!sessions.sessionExists(sessionId)) throw new Error(INVALID_SESSION_ID_MSG)
       if (!action || typeof action !== 'object' || action.length) {
@@ -59,17 +37,6 @@ const chiron = () => {
         if (typeof action.response !== 'string') throw new Error('Action must supply a response string')
       }
       actions.push(action)
-    },
-    respond (sessionId, message) {
-      if (!sessions.sessionExists(sessionId)) throw new Error(INVALID_SESSION_ID_MSG)
-      // sanitize input
-      if (typeof message !== 'string') throw new Error('Input must be present and be of type string')
-
-      const action = actionFromKeyword(message.toLowerCase())
-
-      if (!action) return DEFAULT_RESPONSE
-
-      return action.response
     },
     getAction (label) {
       return actionFromLabel(label)

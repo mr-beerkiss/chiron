@@ -1,8 +1,7 @@
+/* eslint-env jest */
 import shortid from 'shortid'
-import chiron from '.'
 import sessionManager from './session-manager'
 
-/* eslint-env jest */
 describe('session API', () => {
   const testUser = 'testuser'
 

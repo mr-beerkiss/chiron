@@ -10,55 +10,12 @@ describe('chiron', () => {
 
   it('has an API', () => {
     expect(typeof defaultBot.learn).toBe('function')
-    expect(typeof defaultBot.respond).toBe('function')
     expect(typeof defaultBot.getAction).toBe('function')
     expect(typeof defaultBot.getActions).toBe('function')
   })
 
   it('has some default actions', () => {
-    expect(defaultBot.respond(defaultSessionId, 'hello')).toEqual(defaultGreeting)
-  })
-
-  describe('respond API', () => {
-    const testMsg = 'This should be ok'
-
-    let scopedBot
-    let scopedSessionId
-
-    beforeEach(() => {
-      scopedBot = chiron()
-      scopedSessionId = scopedBot.sessions.createSession(testUser)
-    })
-
-    it('requires a valid session id', () => {
-      const thrownMsg = 'A valid session id is required to call this method'
-      expect(scopedBot.respond).toThrow(thrownMsg)
-      const dodgyscopedSessionId = 'A dodgy session id'
-      expect(scopedBot.respond.bind(scopedBot, dodgyscopedSessionId, testMsg)).toThrow(thrownMsg)
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).toBeTruthy()
-    })
-
-    it('throws an error if invalid input type is provided', () => {
-      const thrownMsg = 'Input must be present and be of type string'
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId)).toThrow(thrownMsg)
-      const dodgyArgs = [null, 45.1, [1, 2, 3], {foo: 'bar'}]
-      dodgyArgs.forEach(a => expect(scopedBot.respond.bind(scopedBot, scopedSessionId, a)).toThrow(thrownMsg))
-      expect(scopedBot.respond.bind(scopedBot, scopedSessionId, testMsg)).toBeTruthy()
-    })
-
-    it('returns a default message when it doesn\'t understand the input', () => {
-      expect(scopedBot.respond(scopedSessionId, 'dflkasjglasjlgas')).toEqual('I\'m sorry, I don\'t know what to do about that')
-    })
-
-    it('can use various keywords to perform the same action', () => {
-      const keywords = ['hi', 'hello', 'hey', 'howdy']
-      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).toEqual(defaultGreeting))
-    })
-
-    it('doesn`t care about input case', () => {
-      const keywords = ['hi', 'HI', 'Hi', 'hI']
-      keywords.forEach(k => expect(scopedBot.respond(scopedSessionId, k)).toEqual(defaultGreeting))
-    })
+    expect(defaultBot.responses.respond('hello')).toEqual(defaultGreeting)
   })
 
   describe('learn API', () => {
@@ -116,7 +73,7 @@ describe('chiron', () => {
 
     it('learns a new action and responds accordingly', () => {
       scopedBot.learn(scopedSessionId, action)
-      action.keywords.forEach(kw => expect(scopedBot.respond(scopedSessionId, kw)).toEqual(action.response))
+      action.keywords.forEach(kw => expect(scopedBot.responses.respond(scopedSessionId, kw)).toEqual(action.response))
     })
   })
 })
