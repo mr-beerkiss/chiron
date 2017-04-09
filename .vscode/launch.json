@@ -24,27 +24,27 @@
       "outFiles": []
     },
     {
-      "name": "Mocha",
+      "name": "Jest",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/node_modules/.bin/_mocha",
+      "program": "${workspaceRoot}/node_modules/.bin/jest",
       "stopOnEntry": false,
       "args": [
-        "--require",
-        "babel-register",
-        "--no-timeouts",
-        "src/**/*.test.js"
+        "--runInBand"
       ],
       "cwd": "${workspaceRoot}",
       "preLaunchTask": null,
       "runtimeExecutable": null,
+      "runtimeArgs": [
+        "--nolazy"
+      ],
       "env": {
         "NODE_ENV": "test"
       },
       "console": "internalConsole",
       "sourceMaps": true,
       "outFiles": []
-    }
+    },
     {
       "name": "Attach",
       "type": "node",
