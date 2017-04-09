@@ -1,79 +1,13 @@
 /* eslint-env jest */
-import chiron, { ActionTypes } from '.'
+import chiron from '.'
 
 describe('chiron', () => {
   const defaultGreeting = 'Hello, I`m Chiron!'
-  const testUser = 'testuser'
 
   let defaultBot = chiron()
-  let defaultSessionId = defaultBot.sessions.createSession(testUser)
 
-  it('has an API', () => {
-    expect(typeof defaultBot.learn).toBe('function')
-    expect(typeof defaultBot.getAction).toBe('function')
-    expect(typeof defaultBot.getActions).toBe('function')
-  })
 
   it('has some default actions', () => {
     expect(defaultBot.responses.respond('hello')).toEqual(defaultGreeting)
-  })
-
-  describe('learn API', () => {
-    let scopedBot
-    let scopedSessionId
-
-    beforeEach(() => {
-      scopedBot = chiron()
-      scopedSessionId = scopedBot.sessions.createSession(testUser)
-    })
-
-    const action = {
-      label: 'test',
-      type: ActionTypes.SAY,
-      keywords: ['test', 'testing', 'testable'],
-      response: 'Clearly you running a test!'
-    }
-
-    it('requires a valid session id', () => {
-      const thrownMsg = 'A valid session id is required to call this method'
-      expect(scopedBot.learn).toThrow(thrownMsg)
-      const dodgyscopedSessionId = 'A dodgy session id'
-      expect(scopedBot.learn.bind(scopedBot, dodgyscopedSessionId, action)).toThrow(thrownMsg)
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, action)).toBeTruthy()
-    })
-
-    it('throws an error if invalid input type is provided', () => {
-      const thrownMsg = 'Input must be present and must be an object'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId)).toThrow(thrownMsg)
-      const dodgyArgs = [null, 'A string', 43.5, [1, 2, 3]]
-      dodgyArgs.forEach(a => expect(scopedBot.learn.bind(scopedBot, scopedSessionId, a)).toThrow(thrownMsg))
-    })
-
-    it('validates its input object', () => {
-      const badAction = {}
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have a label')
-      badAction.label = 'Some label'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action type is not valid')
-      badAction.type = Symbol('faulty-action')
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action type is not valid')
-      badAction.type = ActionTypes.SAY
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have a keywords array')
-      badAction.keywords = []
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must have at least one keyword')
-      badAction.keywords = ['some keyword']
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toThrow('Action must supply a response string')
-      badAction.response = 'some response'
-      expect(scopedBot.learn.bind(scopedBot, scopedSessionId, badAction)).toBeTruthy()
-    })
-
-    it('returns a learned action', () => {
-      scopedBot.learn(scopedSessionId, action)
-      expect(scopedBot.getAction(action.label)).toEqual(action)
-    })
-
-    it('learns a new action and responds accordingly', () => {
-      scopedBot.learn(scopedSessionId, action)
-      action.keywords.forEach(kw => expect(scopedBot.responses.respond(scopedSessionId, kw)).toEqual(action.response))
-    })
   })
 })
